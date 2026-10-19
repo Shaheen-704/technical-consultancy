@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shaheen Haque — Technical Operations & Integration Consultancy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Calendly Popup Widget Stylesheet & Script -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        mono: {
+                            bg: '#000000',
+                            surface: '#0a0a0a',
+                            card: '#121212',
+                            elevated: '#1a1a1a',
+                            border: '#2a2a2a',
+                            borderHover: '#404040',
+                            text: '#f5f5f7',
+                            muted: '#8e8e93',
+                            subtle: '#636366',
+                            accent: '#ffffff'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', "Segoe UI", 'Roboto', 'Helvetica', 'Arial', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        html, body {
+            background-color: #000000;
+            color: #f5f5f7;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .viewport-container {
+            width: 100vw;
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Relaxed scroll on mobile screens */
+        @media (max-width: 768px) {
+            html, body, .viewport-container {
+                overflow-y: auto;
+                height: auto;
+                scroll-snap-type: none;
+            }
+            .section-page {
+                height: auto !important;
+                min-height: 100vh;
+                padding: 6rem 1.5rem 4rem 1.5rem !important;
+            }
+        }
+
+        .section-page {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 4rem 2rem 2rem 2rem;
+            box-sizing: border-box;
+        }
+
+        /* Deep Translucent Glassmorphism Navigation */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        /* Hyper-Translucent Premium Glassmorphism Card Style */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(50px) saturate(200%);
+            -webkit-backdrop-filter: blur(50px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+                        inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Specular White Shimmer Border Highlight on Hover */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.05));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0.5;
+            transition: opacity 0.4s ease, background 0.4s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 30px 70px -10px rgba(255, 255, 255, 0.12), 
+                        inset 0 1px 1px rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card:hover::before {
+            opacity: 1;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.15));
+        }
+
+        /* Inner Frosted Glass Containers */
+        .glass-inner {
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .apple-gradient-text {
+            background: linear-gradient(135deg, #ffffff 30%, #8e8e93 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .anim-item {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        
+        .section-page.visible .anim-item {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Micro-animation pulse for turnaround time popup */
+        @keyframes popIn {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.02); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pop-animation {
+            animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .delay-1 { transition-delay: 100ms; }
+        .delay-2 { transition-delay: 200ms; }
+        .delay-3 { transition-delay: 300ms; }
+        .delay-4 { transition-delay: 400ms; }
+
+        @keyframes floatOrb1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, -40px) scale(1.3); }
+        }
+        @keyframes floatOrb2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-50px, 50px) scale(1.2); }
+        }
+        .animate-orb-1 {
+            animation: floatOrb1 16s ease-in-out infinite;
+        }
+        .animate-orb-2 {
+            animation: floatOrb2 18s ease-in-out infinite;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-mono-bg text-mono-text">
+
+    <!-- Header Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between text-xs tracking-wide">
+            <a href="#page-1" class="font-semibold text-mono-text hover:text-white transition-colors duration-200">Shaheen Haque</a>
+            <nav class="hidden md:flex space-x-8 text-mono-muted font-medium">
+                <a href="#page-1" class="hover:text-white transition-colors duration-200">Trust & Impact</a>
+                <a href="#page-2" class="hover:text-white transition-colors duration-200">All Services</a>
+                <a href="#page-3" class="hover:text-white transition-colors duration-200">Enterprise Pedigree</a>
+                <a href="#page-4" class="hover:text-white transition-colors duration-200">Book Audit</a>
+            </nav>
+            <div class="flex items-center space-x-3">
+                <a href="https://www.linkedin.com/in/shaheen-haque-97ba901a5/" target="_blank" rel="noopener noreferrer" class="text-mono-muted hover:text-white transition-colors p-1.5 rounded-full hover:bg-white/10" title="LinkedIn Profile">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.25V10.9H6.46M7.86 6.72a1.47 1.47 0 0 0-1.47 1.47c0 .81.66 1.47 1.47 1.47a1.47 1.47 0 0 0 1.47-1.47c0-.81-.66-1.47-1.47-1.47Z"/></svg>
+                </a>
+                <button onclick="Calendly.initPopupWidget({url: 'https://calendly.com/shaheen-cob19'});return false;" class="bg-white text-black px-4 py-1.5 rounded-full font-semibold hover:bg-mono-muted transition-all duration-300 transform hover:scale-105 shadow-lg shadow-white/10 cursor-pointer">Schedule Call</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Viewport Container -->
+    <div class="viewport-container" id="viewport">
+
+        <!-- PAGE 1: SPLIT HERO & TRUST METRICS -->
+        <section id="page-1" class="section-page">
+            <!-- Glass Orbs (Monochrome Dark Radial Glows to project light through translucent glass) -->
+            <div class="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none">
+                <div class="w-[650px] h-[650px] bg-white/20 rounded-full blur-[180px] animate-orb-1"></div>
+                <div class="w-[500px] h-[500px] bg-white/10 rounded-full blur-[160px] animate-orb-2 -ml-48 -mt-48"></div>
+            </div>
+            
+            <div class="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-4">
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white text-[11px] font-semibold anim-item">
+                        <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> Technical Operations & Integration Consultant
+                    </div>
+                    <h1 class="text-3xl md:text-5xl font-bold tracking-tight apple-gradient-text leading-[1.1] anim-item delay-1">
+                        Precision API Infrastructure & Escalation Triage.
+                    </h1>
+                    <p class="text-sm md:text-base text-mono-muted font-normal leading-relaxed anim-item delay-2">
+                        I partner with scaling SaaS platforms to eliminate silent webhook drops, build observability pipelines, and manage tier-3 incident resolution without expanding internal overhead.
+                    </p>
+                    <div class="flex flex-wrap items-center gap-3 pt-2 anim-item delay-3">
+                        <button onclick="Calendly.initPopupWidget({url: 'https://calendly.com/shaheen-cob19'});return false;" class="bg-white text-black px-6 py-3 rounded-full font-semibold text-xs hover:bg-mono-muted transition-all shadow-xl shadow-white/10 cursor-pointer">
+                            Book Consultation
+                        </button>
+                        <a href="https://www.linkedin.com/in/shaheen-haque-97ba901a5/" target="_blank" rel="noopener noreferrer" class="glass-card px-6 py-3 rounded-full font-medium text-xs text-mono-text hover:border-white/50 transition-all inline-flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.25V10.9H6.46M7.86 6.72a1.47 1.47 0 0 0-1.47 1.47c0 .81.66 1.47 1.47 1.47a1.47 1.47 0 0 0 1.47-1.47c0-.81-.66-1.47-1.47-1.47Z"/></svg> Connect on LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 anim-item delay-4">
+                    <div class="glass-card p-6 rounded-3xl space-y-4">
+                        <p class="text-xs font-semibold uppercase tracking-widest text-white">Verified Impact Metrics</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="glass-inner p-4 rounded-2xl">
+                                <p class="text-2xl md:text-3xl font-bold text-white">45k+</p>
+                                <p class="text-[10px] text-mono-muted uppercase tracking-wider mt-0.5">Merchants Supported</p>
+                            </div>
+                            <div class="glass-inner p-4 rounded-2xl">
+                                <p class="text-2xl md:text-3xl font-bold text-white">100%</p>
+                                <p class="text-[10px] text-mono-muted uppercase tracking-wider mt-0.5">SLA Adherence</p>
+                            </div>
+                            <div class="glass-inner p-4 rounded-2xl">
+                                <p class="text-2xl md:text-3xl font-bold text-white">40%</p>
+                                <p class="text-[10px] text-mono-muted uppercase tracking-wider mt-0.5">Ticket Reduction</p>
+                            </div>
+                            <div class="glass-inner p-4 rounded-2xl">
+                                <p class="text-2xl md:text-3xl font-bold text-white">99.9%</p>
+                                <p class="text-[10px] text-mono-muted uppercase tracking-wider mt-0.5">System Reliability</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 2: COMPREHENSIVE SERVICES -->
+        <section id="page-2" class="section-page">
+            <div class="max-w-6xl mx-auto w-full pt-4">
+                <div class="text-center max-w-xl mx-auto mb-8 anim-item">
+                    <p class="text-xs uppercase tracking-widest text-mono-muted font-semibold mb-1">Independent Consultancy Offerings</p>
+                    <h2 class="text-2xl md:text-4xl font-bold tracking-tight text-white">Comprehensive Technical Services</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="glass-card p-6 rounded-2xl flex flex-col justify-between anim-item delay-1">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full bg-white/10 text-white">Diagnostic</span>
+                                <span class="text-xs text-mono-muted">Fixed-Scope</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white mb-2">1. API & Webhook Health Audits</h3>
+                            <p class="text-mono-muted text-xs leading-relaxed mb-4">
+                                Deep diagnostic analysis of REST endpoints, webhook payload deliveries, and OAuth authentication handshakes to detect silent delivery failures and edge cases.
+                            </p>
+                        </div>
+                        <div class="border-t border-white/10 pt-3 flex items-center justify-between text-xs">
+                            <span class="text-mono-muted">Deliverable: Remediation Report</span>
+                            <button onclick="Calendly.initPopupWidget({url: 'https://calendly.com/shaheen-cob19'});return false;" class="text-white hover:text-mono-muted hover:underline font-medium cursor-pointer">Inquire &rarr;</button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl flex flex-col justify-between anim-item delay-2">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full bg-white/10 text-white">Operations</span>
+                                <span class="text-xs text-mono-muted">Retainer / Project</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white mb-2">2. Support Ops & Tier-3 Escalations</h3>
+                            <p class="text-mono-muted text-xs leading-relaxed mb-4">
+                                Establishing P0–P4 incident triage protocols, configuring Zendesk/Jira workflows, and structuring escalation channels to protect core developer bandwidth.
+                            </p>
+                        </div>
+                        <div class="border-t border-white/10 pt-3 flex items-center justify-between text-xs">
+                            <span class="text-mono-muted">Deliverable: Triage Pipeline</span>
+                            <button onclick="Calendly.initPopupWidget({url: 'https://calendly.com/shaheen-cob19'});return false;" class="text-white hover:text-mono-muted hover:underline font-medium cursor-pointer">Inquire &rarr;</button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl flex flex-col justify-between anim-item delay-3">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full bg-white/10 text-white">Observability</span>
+                                <span class="text-xs text-mono-muted">Implementation</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white mb-2">3. Monitoring & Analytics Dashboards</h3>
+                            <p class="text-mono-muted text-xs leading-relaxed mb-4">
+                                Custom configuration of real-time monitoring suites (Kibana dashboards, Datadog APM) to track proactive error rates, connectivity, and system health metrics.
+                            </p>
+                        </div>
+                        <div class="border-t border-white/10 pt-3 flex items-center justify-between text-xs">
+                            <span class="text-mono-muted">Deliverable: Custom Dashboards</span>
+                            <button onclick="Calendly.initPopupWidget({url: 'https://calendly.com/shaheen-cob19'});return false;" class="text-white hover:text-mono-muted hover:underline font-medium cursor-pointer">Inquire &rarr;</button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl flex flex-col justify-between anim-item delay-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full bg-white/10 text-white">Enablement</span>
+                                <span class="text-xs text-mono-muted">Sprint Package</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white mb-2">4. Technical Runbooks & Documentation</h3>
+                            <p class="text-mono-muted text-xs leading-relaxed mb-4">
+                                Authoring standardized internal runbooks, troubleshooting playbooks, and developer onboarding user guides to drastically cut down support ticket resolution times.
+                            </p>
+                        </div>
+                        <div class="border-t border-white/10 pt-3 flex items-center justify-between text-xs">
+                            <span class="text-mono-muted">Deliverable: Playbook Suite</span>
+                            <button onclick="Calendly.initPopupWidget({url: 'https://calendly.com/shaheen-cob19'});return false;" class="text-white hover:text-mono-muted hover:underline font-medium cursor-pointer">Inquire &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 3: ENTERPRISE PEDIGREE & 3-STEP PROCESS -->
+        <section id="page-3" class="section-page">
+            <div class="max-w-6xl mx-auto w-full pt-4 space-y-6">
+                <!-- Social Proof Banner Badge -->
+                <div class="glass-card px-5 py-3 rounded-2xl text-center anim-item">
+                    <p class="text-[11px] text-mono-muted tracking-wide">
+                        <span class="text-white font-semibold">Enterprise Pedigree:</span> Experience built supporting infrastructure used by industry-leading platforms (UrbanPiper, Ford Pro, Vymo).
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <!-- Left Column: Company Backgrounds -->
+                    <div class="lg:col-span-7 space-y-3 anim-item delay-1">
+                        <div class="glass-card p-4 rounded-2xl">
+                            <h3 class="text-sm font-bold text-white">UrbanPiper</h3>
+                            <p class="text-xs text-mono-muted mt-1">Provided real-time technical support for 45,000+ merchants, built custom Kibana dashboards, and collaborated with engineering units on P0–P4 incident triage.</p>
+                        </div>
+
+                        <div class="glass-card p-4 rounded-2xl">
+                            <h3 class="text-sm font-bold text-white">Ford Pro</h3>
+                            <p class="text-xs text-mono-muted mt-1">Streamlined data onboarding for 80+ enterprise stakeholders, built real-time performance dashboards using Datadog, and authored technical guides.</p>
+                        </div>
+
+                        <div class="glass-card p-4 rounded-2xl">
+                            <h3 class="text-sm font-bold text-white">Vymo</h3>
+                            <p class="text-xs text-mono-muted mt-1">Diagnosed 130+ post-production incidents using browser dev tools, SQL log parsing, and API inspection, consistently maintaining 100% SLA adherence across complex workflows.</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: 3-Step Process for Clarity -->
+                    <div class="lg:col-span-5 anim-item delay-2">
+                        <div class="glass-card p-6 rounded-3xl space-y-4">
+                            <p class="text-xs font-semibold uppercase tracking-widest text-white">How We Work (3-Step Process)</p>
+                            <div class="space-y-3">
+                                <div class="glass-inner p-3.5 rounded-xl">
+                                    <p class="text-xs font-bold text-white">1. Discovery Call</p>
+                                    <p class="text-[11px] text-mono-muted mt-0.5">15-minute diagnostic chat to uncover your current integration and support roadblocks.</p>
+                                </div>
+                                <div class="glass-inner p-3.5 rounded-xl">
+                                    <p class="text-xs font-bold text-white">2. Audit & Execution</p>
+                                    <p class="text-[11px] text-mono-muted mt-0.5">Deep-dive analysis, webhook stabilization, or custom observability setup.</p>
+                                </div>
+                                <div class="glass-inner p-3.5 rounded-xl">
+                                    <p class="text-xs font-bold text-white">3. Handover & Scale</p>
+                                    <p class="text-[11px] text-mono-muted mt-0.5">Clean runbooks, operational stability, and ongoing tier-3 support resilience.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 4: ESTIMATOR TOOL & POPUP TRIGGER BUTTON -->
+        <section id="page-4" class="section-page">
+            <div class="max-w-7xl mx-auto w-full pt-4 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                
+                <!-- Left Column: Estimator -->
+                <div class="lg:col-span-7 anim-item">
+                    <div class="glass-card p-6 md:p-8 rounded-3xl">
+                        <div class="mb-5">
+                            <p class="text-xs uppercase tracking-widest text-mono-muted font-semibold mb-1">Interactive Tool</p>
+                            <h3 class="text-xl font-bold text-white tracking-tight">Scope & Engagement Estimator</h3>
+                            <p class="text-mono-muted text-xs mt-1">Select an objective to calculate estimated turnaround time.</p>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 mb-5">
+                            <button onclick="updateEstimator('audit')" id="btn-audit" class="p-3 rounded-xl border border-white/30 bg-white/10 text-left transition-all">
+                                <p class="text-[9px] text-mono-muted uppercase tracking-wider">Option A</p>
+                                <p class="text-white font-medium text-xs mt-0.5">API Audit</p>
+                            </button>
+                            <button onclick="updateEstimator('ops')" id="btn-ops" class="p-3 rounded-xl border border-white/10 bg-mono-elevated text-left transition-all">
+                                <p class="text-[9px] text-mono-muted uppercase tracking-wider">Option B</p>
+                                <p class="text-white font-medium text-xs mt-0.5">Support Ops</p>
+                            </button>
+                            <button onclick="updateEstimator('dash')" id="btn-dash" class="p-3 rounded-xl border border-white/10 bg-mono-elevated text-left transition-all">
+                                <p class="text-[9px] text-mono-muted uppercase tracking-wider">Option C</p>
+                                <p class="text-white font-medium text-xs mt-0.5">Observability</p>
+                            </button>
+                        </div>
+
+                        <div id="estimator-output" class="glass-inner p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 transition-all">
+                            <div>
+                                <span id="est-badge" class="inline-block px-2 py-0.5 rounded-full text-[9px] font-semibold bg-white/10 text-white mb-1">DIAGNOSTIC SERVICE</span>
+                                <h4 id="est-title" class="text-sm font-semibold text-white">7-Day API & Payload Health Audit</h4>
+                                <p id="est-desc" class="text-mono-muted text-[11px] mt-0.5 leading-relaxed">Deep-dive analysis into endpoint responses and webhook error rates with an actionable remediation report.</p>
+                            </div>
+                            <div class="text-center sm:text-right shrink-0">
+                                <p class="text-[9px] text-mono-muted uppercase tracking-wider">Turnaround</p>
+                                <p id="est-time" class="text-base font-bold text-white mt-0.5 pop-animation">3–5 Days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Clean Popup Call-to-Action Card -->
+                <div class="lg:col-span-5 anim-item delay-1">
+                    <div class="glass-card p-8 md:p-10 rounded-3xl text-center flex flex-col justify-center items-center min-h-[340px]">
+                        <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white mb-4 border border-white/10">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <p class="text-xs uppercase tracking-widest text-mono-muted font-semibold mb-1">Zero Risk Consultation</p>
+                        <h3 class="text-xl font-bold text-white tracking-tight mb-2">Ready to Stabilize Your Infrastructure?</h3>
+                        <p class="text-mono-muted text-xs max-w-xs mx-auto mb-6">
+                            Pick a convenient time for a 15-minute discovery call to discuss your exact requirements.
+                        </p>
+
+                        <!-- Popup Button Trigger -->
+                        <button onclick="Calendly.initPopupWidget({url: 'https://calendly.com/shaheen-cob19'});return false;" class="bg-white text-black px-8 py-3.5 rounded-full text-xs font-semibold hover:bg-mono-muted transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-white/10 cursor-pointer">
+                            Schedule Discovery Call
+                        </button>
+
+                        <footer class="mt-6 text-[10px] text-mono-muted flex items-center justify-center gap-3">
+                            <span>&copy; 2026 Shaheen Haque</span>
+                            <span>&bull;</span>
+                            <a href="https://www.linkedin.com/in/shaheen-haque-97ba901a5/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors underline">LinkedIn Profile</a>
+                        </footer>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Script for Fullscreen Scroll Intersection and Estimator -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sections = document.querySelectorAll('.section-page');
+            const observerOptions = {
+                root: document.getElementById('viewport'),
+                threshold: 0.4
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+
+        function updateEstimator(type) {
+            const btnAudit = document.getElementById('btn-audit');
+            const btnOps = document.getElementById('btn-ops');
+            const btnDash = document.getElementById('btn-dash');
+            
+            const estBadge = document.getElementById('est-badge');
+            const estTitle = document.getElementById('est-title');
+            const estDesc = document.getElementById('est-desc');
+            const estTime = document.getElementById('est-time');
+            const outputBox = document.getElementById('estimator-output');
+
+            outputBox.style.opacity = '0.3';
+
+            setTimeout(() => {
+                [btnAudit, btnOps, btnDash].forEach(btn => {
+                    btn.className = "p-3 rounded-xl border border-white/10 bg-mono-elevated text-left transition-all";
+                });
+
+                if (type === 'audit') {
+                    btnAudit.className = "p-3 rounded-xl border border-white/30 bg-white/10 text-left transition-all";
+                    estBadge.innerText = "DIAGNOSTIC SERVICE";
+                    estTitle.innerText = "7-Day API & Payload Health Audit";
+                    estDesc.innerText = "Deep-dive analysis into endpoint responses and webhook error rates with an actionable remediation report.";
+                    estTime.innerText = "3–5 Days";
+                } else if (type === 'ops') {
+                    btnOps.className = "p-3 rounded-xl border border-white/30 bg-white/10 text-left transition-all";
+                    estBadge.innerText = "OPERATIONAL SETUP";
+                    estTitle.innerText = "Support Triage & SLA Architecture";
+                    estDesc.innerText = "Structuring Zendesk/Jira workflows, P0–P4 escalation pipelines, and team runbooks to clear ticket backlogs.";
+                    estTime.innerText = "2 Weeks";
+                } else if (type === 'dash') {
+                    btnDash.className = "p-3 rounded-xl border border-white/30 bg-white/10 text-left transition-all";
+                    estBadge.innerText = "OBSERVABILITY ENGAGEMENT";
+                    estTitle.innerText = "Custom Kibana & Datadog Dashboards";
+                    estDesc.innerText = "Building real-time tracking suites for proactive error detection, system connectivity, and performance metrics.";
+                    estTime.innerText = "1–2 Weeks";
+                }
+
+                // Re-trigger micro-animation pop effect
+                estTime.classList.remove('pop-animation');
+                void estTime.offsetWidth;
+                estTime.classList.add('pop-animation');
+
+                outputBox.style.opacity = '1';
+            }, 150);
+        }
+    </script>
+</body>
+</html>
